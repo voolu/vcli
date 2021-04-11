@@ -45,14 +45,9 @@ async def create_account():
             print('passwords do not match')
             return
 
-        token = await auth.create_account(answers['user'], answers['pass'])
-        p = os.path.expanduser('~/.voolu/')
-        if not os.path.exists(p):
-            os.mkdir(p)
-        with open(p + 'token', 'w') as f:
-            f.write(token)
+        await auth.create_account(answers['user'], answers['pass'])
 
-        print('Logged in and saved token at ~/.voolu/token')
+        print('Account create, please login using "vacc login"')
 
 
 @cli.command()

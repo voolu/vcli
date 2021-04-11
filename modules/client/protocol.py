@@ -45,7 +45,7 @@ class ClientProtocol:
 
     async def attempt_connection(self, ip_addr):
         ssl_context = await self.auth_service.get_certificate(ip_addr)
-        reader, writer = await asyncio.open_connection(ip_addr, 8080, ssl=ssl_context)
+        reader, writer = await asyncio.open_connection(ip_addr, 222, ssl=ssl_context)
 
         # send client connect request
         writer.write(b'CCQ' + self.host_token.encode() + b'\n')
