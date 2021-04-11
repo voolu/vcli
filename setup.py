@@ -23,7 +23,7 @@ scripts = ['vhost', 'vsh', 'vcp', 'vacc']
 setup(
     name='voolu',
     description='SSH is so last year.',
-    version='0.0.5',
+    version='0.0.7',
     packages=find_packages(),  # list of all packages
     install_requires=install_requires,
     python_requires='>=3.7',  # any python greater than 3.6
@@ -35,9 +35,9 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     license='MIT',
-    # url='https://github.com/CITGuru/cver',
+    url='https://github.com/voolu/vcli',
     dependency_links=dependency_links,
-    # author_email='',
+    author_email='support@voolu.io',
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.7",

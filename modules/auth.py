@@ -1,5 +1,6 @@
 import httpx
 import os
+import ssl
 
 import modules.exceptions as ex
 
@@ -19,10 +20,20 @@ class AuthService:
     async def close(self):
         await self.client.aclose()
 
+    async def get_certificate(self, endpoint):
+        ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        ssl_context.check_hostname = False
+        r = await self.client.get(f'{LOOKUP_SERVICE_URL}/replicas/{endpoint}/cert')
+        r = r.json()
+        ssl_context.load_verify_locations(cadata=r['cert'])
+
+        return ssl_context
+
     async def find_replicas(self):
         r = await self.client.get(LOOKUP_SERVICE_URL + '/replicas')
         r = r.json()
         return r['replicas']
+        # return ['127.0.0.1']
         # return ['0.0.0.0']
 
     async def login(self, email, password):

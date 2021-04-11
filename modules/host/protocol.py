@@ -1,4 +1,5 @@
 import asyncio
+import ssl
 from modules.auth import AuthService
 
 
@@ -20,8 +21,10 @@ class HostProtocol:
     async def __aenter__(self):
         replicas = await self.auth_service.find_replicas()
         endpoint = replicas[0]
+        ssl_context = await self.auth_service.get_certificate(endpoint)
 
-        reader, writer = await asyncio.open_connection(endpoint, 8080)
+
+        reader, writer = await asyncio.open_connection(endpoint, 8080, ssl=ssl_context)
 
         self.reader = reader
         self.writer = writer

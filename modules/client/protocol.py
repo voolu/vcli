@@ -13,6 +13,7 @@ class ClientProtocol:
 
     async def __aenter__(self):
         self.replicas = await self.auth_service.find_replicas()
+
         self.host_token = await self.auth_service.get_host_token(self.host_tag)
 
         self.reader, self.writer = await self.find_connection()
@@ -33,25 +34,26 @@ class ClientProtocol:
             self.writer.write(b'HBT\n')
 
     async def find_connection(self):
+        # TODO: this should be done in parallel
         for ip_addr in self.replicas:
-            con = await ClientProtocol.attempt_connection(self.host_token, ip_addr)
+            con = await self.attempt_connection(ip_addr)
             if con:
                 print('connecting to:', ip_addr)
                 return con
 
         raise Exception(f"Can't find host {self.host_token}")
 
-    @staticmethod
-    async def attempt_connection(host_token, ip_addr):
-        reader, writer = await asyncio.open_connection(ip_addr, 8080)
+    async def attempt_connection(self, ip_addr):
+        ssl_context = await self.auth_service.get_certificate(ip_addr)
+        reader, writer = await asyncio.open_connection(ip_addr, 8080, ssl=ssl_context)
 
         # send client connect request
-        writer.write(b'CCQ' + host_token.encode() + b'\n')
+        writer.write(b'CCQ' + self.host_token.encode() + b'\n')
         await writer.drain()
         # get client connect response
         ccr = await reader.readline()
         if ccr.endswith(b'N\n'):
-            print(host_token, 'not found at host', ip_addr)
+            print(self.host_token, 'not found at host', ip_addr)
             writer.close()
             return
         else:
